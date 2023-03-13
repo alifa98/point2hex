@@ -1,0 +1,2 @@
+## git ignore for Python
+__pycache__/
