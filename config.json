@@ -1,0 +1,7 @@
+{
+    "default_routing_api_base_url": "http://router.project-osrm.org",
+    "default_concurrent_requests": 10,
+    "default_max_retries": 3,
+    "default_retry_delay": 1000,
+    "default_timeout": 10000
+}
