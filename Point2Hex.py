@@ -1,10 +1,20 @@
 import argparse
+import logging
 import os
+import sys
 from lib.ConfigLoader import ConfigLoader
-from lib.LocationToPoint import send_get_route_request
-import asyncio
 import pandas as pd
-import time
+import threading
+from lib.GetPointsThread import GetRoutePointsTask
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
 
 config = ConfigLoader(os.path.join(os.path.dirname(
     os.path.abspath(__file__)), os.sep+'config.json'))
@@ -30,52 +40,69 @@ parser.add_argument('-ps', '--point-save-off',
                     help='points will not be saved as a column', action='store_false')
 parser.add_argument('-u', '--base-url',
                     help='Base URL of the routing service [OSRM]', action='store', default=config("default_routing_api_base_url"))
-parser.add_argument('-t', '--threads', help='Concurrent requests',
+parser.add_argument('-t', '--threads', help='Number of Threads',
                     action='store', default=config('default_concurrent_requests'))
+parser.add_argument('-cr', '--concurrent-requests',
+                    help='number of concurrent requests to the OSRM API', action='store', default=10)
 parser.add_argument('-mt', '--max-try', help='Max retries',
                     action='store', default=config('default_max_retries'))
 parser.add_argument('-d', '--delay', help='Retry delay (ms)',
                     action='store', default=config('default_retry_delay'))
 parser.add_argument('-T', '--timeout',
                     help='Timeout for each request (ms)', action='store', default=config('default_timeout'))
-
+parser.add_argument('-S', '--split',
+                    help='Output of each thread separately', action='store_true')
 # points 2 Hexagons
 parser.add_argument('-r', '--resolution',
                     help='Resolution of the hexagon grid', default=9)
 parser.add_argument('-ox', '--hexagon-serquence',
-                    help='Hexagon serquence', default='hex_sequence')
+                    help='Hexagon sequence', default='hex_sequence')
 
 args = parser.parse_args()
 
-limit = asyncio.Semaphore(int(args.threads))
 
-async def get_route_and_set_task(trips, index, start_point, end_point):
-    async with limit:
-        trips.at[index, args.output_column] = send_get_route_request(args.base_url, start_point, end_point)
-        print("Route for trip {} is ready".format(index))
+def get_split_points(total, num_threads):
+    step = (total // int(num_threads))+1
+    split_points_list = [i for i in range(0, total, step)]
 
-async def get_all_routes(trips):
-    tasks = []
-    for i in range(len(trips)):
-        start_point = (trips.iloc[i][args.start_column_longitude], trips.iloc[i][args.start_column_latitude])
-        end_point = (trips.iloc[i][args.end_column_longitude], trips.iloc[i][args.end_column_latitude])
-        task = asyncio.ensure_future(get_route_and_set_task(trips, i, start_point, end_point))
-        tasks.append(task)
-    await asyncio.gather(*tasks, return_exceptions=True)
+    # make sure all of the instaces included (last step may contain more values)
+    split_points_list.pop()
+    split_points_list.append(total) ## rages are like [start,end) so we do not need to add -1 here.
+
+    return split_points_list
 
 
 data_file = pd.read_csv(args.input_file)
 data_file[args.output_column] = pd.Series(dtype=object)
-
-loop = asyncio.new_event_loop()
-asyncio.set_event_loop(loop)
 try:
-    asyncio.get_event_loop().run_until_complete(get_all_routes(data_file))
+    sem = threading.Semaphore(value=int(args.concurrent_requests))
+
+    # with tqdm(total=len(data_file)) as pbar:
+
+    split_points = get_split_points(len(data_file), args.threads)
+
+    threads_list = []
+    # Create new threads
+    for i in range(len(split_points)-1):
+
+        threads_list.append(GetRoutePointsTask(i,
+            data_file, split_points[i], split_points[i+1], sem, args))
+
+    logging.info("Starting...")
+    # Starting the threads
+    for t in threads_list:
+        t.start()
+
+    logging.info("Processing...")
+    # waiting for threads
+    for t in threads_list:
+        t.join()
+
+    logging.info("Task Finished")
+
 except KeyboardInterrupt:
     print("Exiting...")
 
-start_time = time.time()
 
-duration = time.time() - start_time
-
-data_file.to_csv(args.output, index=False)
+if not args.split:
+    data_file.to_csv(f"{args.output}.csv", index=False)
