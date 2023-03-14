@@ -39,7 +39,7 @@ class Seqviz(object):
 
     def plot(self):
         #construct a df
-        df_hex_plot = pd.DataFrame(self.hex_seq, columns=['hex_id'])
+        df_hex_plot = pd.DataFrame(self.hex_seq.split(), columns=['hex_id'])
         df_hex_plot['geometry'] = df_hex_plot.apply(self.add_geometry, axis=1)
         df_hex_plot['sequence'] = range(1, 1+len(df_hex_plot))
 
