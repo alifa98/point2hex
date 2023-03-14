@@ -1,3 +1,6 @@
+### depricated file, will be deleted
+
+
 import logging
 import pandas as pd
 import requests
