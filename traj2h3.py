@@ -2,19 +2,19 @@ import os
 import sys
 import ast
 import zipfile
+import pandas as pd
 from typing import Iterator
 
-import pandas as pd
-from shapely.geometry import LineString
 import h3
+from shapely.geometry import LineString
 
 from viz import Seqviz
 
 class Points2h3(object):
-    def __init__(self, df_traj, hex_resolution, to_plot:bool, output_fname:str) -> None:
+    def __init__(self, df_traj, hex_resolution, plot_heatmap:bool, output_fname:str) -> None:
         self.df_traj = df_traj
         self.hex_resolution = hex_resolution
-        self.to_plot = False or to_plot #whether plot 
+        self.plot_heatmap = plot_heatmap #whether plot heatmap or plot one seq
         self.output_fname = output_fname #whether output to a csv file
         
     # Evaluate the format of list of points, and convert str to list
@@ -78,9 +78,12 @@ class Points2h3(object):
             df_output.to_csv('./output/' + self.output_fname, index=False)
             print("sequence csv file successfully saved")
     
-        if self.to_plot:
-            viz_seq = Seqviz(self.df_traj['trajectory'][0])
-            viz_seq.plot()
+       if self.plot_heatmap:
+            viz_seq = Seqviz(self.df_traj['trajectory'].tolist(), True)
+        else:
+            viz_seq = Seqviz(self.df_traj['trajectory'][0], False)
+        
+        viz_seq.plot()
 
         return self.df_traj
 
