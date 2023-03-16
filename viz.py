@@ -1,14 +1,16 @@
 import json
 import pandas as pd 
-import h3
+from collections import Counter
 
-from shapely.geometry import Polygon
+import h3
 import plotly.express as px
+from shapely.geometry import Polygon
 from geojson import Feature, FeatureCollection
 
 class Seqviz(object):
-    def __init__(self, hex_seq:list) -> None:
+    def __init__(self, hex_seq:list, heatmap:bool) -> None:
         self.hex_seq = hex_seq
+        self.heatmap = heatmap
 
 
     #create a GeoJSON-formatted dictionary using Dataframe, in order to use Plotly express choropleth_mapbox to build map
@@ -39,9 +41,14 @@ class Seqviz(object):
 
     def plot(self):
         #construct a df
-        df_hex_plot = pd.DataFrame(self.hex_seq.split(), columns=['hex_id'])
-        df_hex_plot['geometry'] = df_hex_plot.apply(self.add_geometry, axis=1)
-        df_hex_plot['sequence'] = range(1, 1+len(df_hex_plot))
+        if self.heatmap:
+            candidates = [i for sublist in self.hex_seq for i in sublist.split()] 
+            df_hex_plot = pd.DataFrame(Counter(candidates).items(), columns=['hex_id', 'count'])
+            df_hex_plot['geometry'] = df_hex_plot.apply(self.add_geometry, axis=1)
+        else:
+            df_hex_plot = pd.DataFrame(self.hex_seq.split(), columns=['hex_id'])
+            df_hex_plot['geometry'] = df_hex_plot.apply(self.add_geometry, axis=1)
+            df_hex_plot['sequence'] = range(1, 1+len(df_hex_plot))
 
         #get the lat and lon for the map center
         xx, yy = (df_hex_plot['geometry'][0]).exterior.coords.xy
@@ -52,7 +59,7 @@ class Seqviz(object):
         geojson_obj = (self.hexagons_dataframe_to_geojson
                         (df_hex_plot,
                         hex_id_field='hex_id',
-                        value_field='sequence',
+                        value_field='count' if self.heatmap else 'sequence',
                         geometry_field='geometry'))
 
         #plot
@@ -60,7 +67,7 @@ class Seqviz(object):
                             df_hex_plot, 
                             geojson=geojson_obj, 
                             locations='hex_id', 
-                            color='sequence',
+                            color='count' if self.heatmap else 'sequence',
                             # color_continuous_scale="Viridis",
                             # range_color=(0,df_traj_plot['queue'].mean() ),                  
                             mapbox_style='carto-positron',
