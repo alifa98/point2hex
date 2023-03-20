@@ -19,12 +19,13 @@ class Points2h3(object):
         
     # Evaluate the format of list of points, and convert str to list
     def eval_points(self, route_points):
-        points = ast.literal_eval(route_points)
-        if isinstance(points, list):
-            return points
+        if isinstance(route_points, list): return route_points
         else:
-            print("Please check if the input df has route_points column, which should be list of tuples")
-            sys.exit()
+            points = ast.literal_eval(route_points)
+            if isinstance(points, list): return points
+            else:
+                print("Please check if the input df has route_points column, which should be list of tuples")
+                sys.exit()
         
     # Get hex sequence
     def get_hexseq(self):
