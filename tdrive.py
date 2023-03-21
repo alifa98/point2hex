@@ -1,5 +1,4 @@
 import os
-import math
 import argparse
 import pandas as pd
 
@@ -8,12 +7,17 @@ from traj2h3 import Points2h3
 parser = argparse.ArgumentParser()
 parser.add_argument("--res", type=int, default=7)
 args = parser.parse_args()
-h3_res = args.res
 
 # hyperparameters
 data_path = './data/release/taxi_log_2008_by_id/'
 export_fname = 'tdrive'
 h3_res = args.res  # hex resolution
+
+# Beijing's boundry
+Min_lat= 37.45000000
+Max_lat = 41.05000000
+Min_lon = 115.41666667
+Max_lon = 117.50000000
 
 # Read T-drive datasets: taxi id, date time, longitude, latitude
 # function that return a list of files to read in a given folder
@@ -40,8 +44,8 @@ print ("%.1f million rows" % (data.shape[0]/1.0e6))
 # Drop duplicates and NAs and long/lat value are out of Beijing 
 data.drop_duplicates(inplace=True)
 data.dropna(inplace=True)
-data = data[(115 <= data['long'].map(math.floor)) & (data['long'].map(math.floor) <= 118)]
-data = data[(39 <= data['lat'].map(math.floor)) & (data['lat'].map(math.floor) <= 42)]
+data = data[ (Min_lon <= data['long']) & (data['long'] <= Max_lon) ] 
+data = data[(Min_lat <= data['lat']) & (data['lat'] <= Max_lat)]
 
 # Convert to pandas datetime type
 data.time = pd.to_datetime(data.time)
