@@ -77,8 +77,8 @@ class Points2h3(object):
         print(f'Initial vocab size: {len(count_dict)}')
         distution = Distviz()
         if not os.path.exists("./output/figs/"):
-            os.makedirs('./output/figs/')
-        distution.plot_dist(count_dict, "output/figs/")
+            os.makedirs("./output/figs/")
+        distution.plot_dist(count_dict, "output/figs/", str(self.hex_resolution))
 
         # Get hirachical tessellation
         if self.hirachical:
