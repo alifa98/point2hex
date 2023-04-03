@@ -1,10 +1,10 @@
-
 import os
 import wget
 import zipfile
 import pandas as pd
 
 from traj2h3 import Points2h3
+from viz import Seqviz
 
 # hyperparameters
 url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/00339/train.csv.zip'
@@ -21,8 +21,8 @@ if not os.path.exists("./data/"):
 # Download porto taxi dataset
 filename = wget.download(url, out=download_dst)
 
-## Loading data
-## Unzipfile
+# Loading data
+# Unzipfile
 zip_file = zipfile.ZipFile(input_path)
 
 # Converting Files To Pandas Dataframe
@@ -36,8 +36,12 @@ df.rename(columns={'TRIP_ID': 'trip_id', 'TAXI_ID': 'taxi_id', 'POLYLINE':'route
 print("preprocessing done")
 
 export_fname += "_hex" +str(h3_res) + ".csv"
-porto_hex_seq = Points2h3(df, h3_res, False, export_fname)
-porto_hex_seq.get_hexseq()
+porto_hex_seq = Points2h3(df, h3_res, True, export_fname)
+traj_seq = porto_hex_seq.get_hexseq()
 
+# Plot heatmap of all trajectories or sequence map of one trajectory
+viz_seq = Seqviz(traj_seq['trajectory'].tolist(), 'heatmap')   
+# viz_seq = Seqviz(traj_seq['trajectory'][1], 'seq')
+viz_seq.show_map()
 
 
