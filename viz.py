@@ -1,6 +1,8 @@
 import json
 import pandas as pd 
 from collections import Counter
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 
 import h3
 import plotly.express as px
@@ -8,17 +10,16 @@ from shapely.geometry import Polygon
 from geojson import Feature, FeatureCollection
 
 class Seqviz(object):
-    def __init__(self, hex_seq:list, heatmap:bool) -> None:
+    def __init__(self, hex_seq:list, plot_type:str) -> None:
         self.hex_seq = hex_seq
-        self.heatmap = heatmap
-
+        self.plot_type = plot_type
 
     #create a GeoJSON-formatted dictionary using Dataframe, in order to use Plotly express choropleth_mapbox to build map
     def hexagons_dataframe_to_geojson(self, df_hex, hex_id_field, geometry_field, value_field, file_output = None):
 
         list_features = []
 
-        for i, row in df_hex.iterrows():
+        for _, row in df_hex.iterrows():
             feature = Feature(geometry = row[geometry_field],
                             id = row[hex_id_field],
                             properties = {"value": row[value_field]})
@@ -35,13 +36,12 @@ class Seqviz(object):
 
     #generate hexagon geometry for each hex
     def add_geometry(self, row):
-        points = h3.h3_to_geo_boundary(row['hex_id'], True)
+        points = h3.cell_to_boundary(row['hex_id'], True)
         return Polygon(points)
-    
 
-    def plot(self):
+    def show_map(self):
         #construct a df
-        if self.heatmap:
+        if self.plot_type == 'heatmap':
             candidates = [i for sublist in self.hex_seq for i in sublist.split()] 
             df_hex_plot = pd.DataFrame(Counter(candidates).items(), columns=['hex_id', 'count'])
             df_hex_plot['geometry'] = df_hex_plot.apply(self.add_geometry, axis=1)
@@ -59,7 +59,7 @@ class Seqviz(object):
         geojson_obj = (self.hexagons_dataframe_to_geojson
                         (df_hex_plot,
                         hex_id_field='hex_id',
-                        value_field='count' if self.heatmap else 'sequence',
+                        value_field='count' if self.plot_type == 'heatmap' else 'sequence',
                         geometry_field='geometry'))
 
         #plot
@@ -67,7 +67,7 @@ class Seqviz(object):
                             df_hex_plot, 
                             geojson=geojson_obj, 
                             locations='hex_id', 
-                            color='count' if self.heatmap else 'sequence',
+                            color='count' if self.plot_type == 'heatmap' else 'sequence',
                             # color_continuous_scale="Viridis",
                             # range_color=(0,df_traj_plot['queue'].mean() ),                  
                             mapbox_style='carto-positron',
@@ -79,6 +79,30 @@ class Seqviz(object):
         fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
         fig.show()
 
+
+class Distviz(object):
+    def plot_dist(self, count_dict, store_dir=None, filename=""):
+        total = sum(count_dict.values())
+        count_tuple = sorted(count_dict.items(), key=lambda item: item[1], reverse=True)
+        distribution_tuple = [(item[0], item[1]/total) for item in count_tuple]
+            
+        mpl.rcParams.update({'font.size': 16})
+
+        x_axis = range(len(distribution_tuple))
+        plt.plot(x_axis, [i[1]*100 for i in distribution_tuple], lw=3) 
+        plt.title("")
+        plt.xlabel("hexagons " + str(x_axis))
+        plt.ylabel("dist.")
+        # plt.legend()
+        plt.xticks([])
+        plt.gca().xaxis.set_tick_params(length=0)
+        plt.gcf().tight_layout()
+
+        filename += "hex_distribution.png"
+        if store_dir is not None:
+            filename = store_dir.rstrip("/") + "/" + filename
+        plt.savefig(filename)
+        # plt.show()        
 
 
 if __name__ == '__main__':
