@@ -98,7 +98,7 @@ class Distviz(object):
         plt.gca().xaxis.set_tick_params(length=0)
         plt.gcf().tight_layout()
 
-        filename += "hex_distribution.png"
+        filename += "_hex_dist.png"
         if store_dir is not None:
             filename = store_dir.rstrip("/") + "/" + filename
         plt.savefig(filename)
