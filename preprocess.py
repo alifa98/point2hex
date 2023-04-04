@@ -32,14 +32,14 @@ for index, file_path in enumerate(full_files):
     data.append(pd.read_csv(file_path, encoding='latin1'))
 
 data = pd.concat(data, ignore_index=True)
-
-print ("Size of data frame: ", data.shape)
 print("data loaded")
 
 # Drop columns that won't be used
 data = data.loc[:, ['id', 'vendor_id', 'pickup_datetime', 'route_points']] 
 data.rename(columns={'id': 'trip_id', 'vendor_id': 'taxi_id', 'pickup_datetime':'timestamp'}, inplace=True)
+data.dropna(inplace=True)
 print("preprocessing done")
+print ("Size of data frame: ", data.shape)
 
 export_fname += "_hex" +str(h3_res) + ".csv"
 nyctaxi_hex_seq = Points2h3(data, h3_res, False, export_fname)
