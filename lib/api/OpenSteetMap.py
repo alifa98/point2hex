@@ -7,13 +7,14 @@ class OpenStreetAPI(API):
         super().__init__()
         self.base_url = base_url
 
+
     def prepare_url(self, start_point, end_point):
         return "{}/route/v1/driving/{},{};{},{}?overview=false&steps=true".format(self.base_url,
                                                                                   start_point[0], start_point[1],
                                                                                   end_point[0], end_point[1])
 
-    def send_requeset(self, url, start_point, end_point):
-        return requests.get(url)
+    def send_requeset(self, session, url, start_point, end_point):
+        return session.get(url)
 
     def parse_response(self, response):
         extracted_steps = None

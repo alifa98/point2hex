@@ -16,34 +16,41 @@ class GeneratePointsThread(threading.Thread):
         self.args = args
 
     def run(self):
-        for index in range(self.start_index, self.end_index):
+        with requests.Session() as request_session:
 
-            start_point = (self.trips.iloc[index][self.args.start_column_longitude],
-                           self.trips.iloc[index][self.args.start_column_latitude])
+            for index in range(self.start_index, self.end_index):
 
-            end_point = (self.trips.iloc[index][self.args.end_column_longitude],
-                         self.trips.iloc[index][self.args.end_column_latitude])
+                start_point = (self.trips.iloc[index][self.args.start_column_longitude],
+                               self.trips.iloc[index][self.args.start_column_latitude])
 
-            route_points = self.send_request(start_point, end_point)
-            logging.debug(f"Thread-{self.id}: route for {index} retrived.")
+                end_point = (self.trips.iloc[index][self.args.end_column_longitude],
+                             self.trips.iloc[index][self.args.end_column_latitude])
 
-            hex_sequence = get_hex_seq_from_route_points(route_points)
+                route_points = self.send_request(
+                    request_session, start_point, end_point)
+                logging.debug(f"Thread-{self.id}: route for {index} retrived.")
 
-            logging.debug(
-                f"Thread-{self.id}- route for {index}- Points: {route_points}")
-            logging.debug(
-                f"Thread-{self.id}- route for {index}- hexs: {hex_sequence}")
+                hex_sequence = None
+                if not self.args.hex_save_off:
+                    hex_sequence = get_hex_seq_from_route_points(route_points)
 
-            self.update_trip(index, route_points, hex_sequence)
-            logging.debug(
-                f"Thread-{self.id}- route for {index} is saved in memory now")
+                logging.debug(
+                    f"Thread-{self.id}- route for {index}- Points: {route_points}")
 
-        if self.args.split:
-            self.save_thread_dataframe()
-            logging.info(
-                f"Thread-{self.id}- Saved its frame in the output file on Disk.")
+                if not self.args.hex_save_off:
+                    logging.debug(
+                        f"Thread-{self.id}- route for {index}- hexs: {hex_sequence}")
 
-    def send_request(self, start_point, end_point):
+                self.update_trip(index, route_points, hex_sequence)
+                logging.debug(
+                    f"Thread-{self.id}- route for {index} is saved in memory now")
+
+            if self.args.split:
+                self.save_thread_dataframe()
+                logging.info(
+                    f"Thread-{self.id}- Saved its frame in the output file on Disk.")
+
+    def send_request(self, session, start_point, end_point):
         """
         Returns list of tuples as a list of points of the route
         """
@@ -51,16 +58,19 @@ class GeneratePointsThread(threading.Thread):
         response = None
         try:
             self.sem.acquire()
-            response = self.api.send_requeset(url, start_point, end_point)
+            response = self.api.send_requeset(
+                session, url, start_point, end_point)
+        except Exception as e:
+            logging.error(
+                f"Error in getting route form {start_point} to {end_point}.")
+            logging.error(e)
         finally:
             self.sem.release()
 
         route_points_list = self.api.parse_response(response)
         if not route_points_list:
             logging.error(
-                f"Error in getting route form {start_point} to {end_point}.")
-            raise Exception(
-                f"Unable to get route from {start_point} to {end_point}")
+                f"Error in getting route form {start_point} to {end_point}. Empty response.")
 
         return route_points_list
 
@@ -69,7 +79,8 @@ class GeneratePointsThread(threading.Thread):
         if not self.args.point_save_off:
             self.trips.at[index, self.args.output_route] = points
 
-        self.trips.at[index, self.args.output_hexagone] = hexs
+        if not self.args.hex_save_off:
+            self.trips.at[index, self.args.output_hexagone] = hexs
 
     def save_thread_dataframe(self):
         self.trips[self.start_index:self.end_index].to_csv(

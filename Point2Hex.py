@@ -41,40 +41,52 @@ if __name__ == '__main__':
 
     data_file = pd.read_csv(args.input_file)
 
+    ## check is the save option for both points and hexagons are off
+    if args.point_save_off and args.hex_save_off:
+        logging.error("Both points and hexagons are not saved. Nothing to do.")
+        exit(1)
+
+    # create the output columns for the points
     if not args.point_save_off:
         data_file[args.output_route] = pd.Series(dtype=object)
 
-    data_file[args.output_hexagone] = pd.Series(dtype=object)
+    # create the output columns for the hexagons
+    if not args.hex_save_off:
+        data_file[args.output_hexagone] = pd.Series(dtype=object)
 
     try:
+        
+        # create a semaphore to limit the number of concurrent requests for the API
         sem = threading.Semaphore(value=int(args.concurrent_requests))
 
         # with tqdm(total=len(data_file)) as pbar:
 
+        # split points of the data to threads
         split_points = get_split_points(len(data_file), args.threads)
 
         threads_list = []
+
         # Create new threads
         for i in range(len(split_points)-1):
-
             threads_list.append(
                 GeneratePointsThread(i, data_file,
                                      split_points[i], split_points[i+1],
                                      sem, api, args)
             )
 
-        logging.info("Starting...")
+
         # Starting the threads
+        logging.info("Starting...")
         for t in threads_list:
             t.start()
 
-        logging.info("Processing...")
-
         # waiting for threads
+        logging.info("Processing...")
         for t in threads_list:
             t.join()
 
-        logging.info("All threads are finished.")
+        logging.debug("All threads are finished.")
+        logging.info("Job is done.")
 
     except KeyboardInterrupt:
         print("Exiting...")
