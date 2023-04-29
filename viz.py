@@ -84,15 +84,15 @@ class Distviz(object):
     def plot_dist(self, count_dict, store_dir=None, filename=""):
         total = sum(count_dict.values())
         count_tuple = sorted(count_dict.items(), key=lambda item: item[1], reverse=True)
-        distribution_tuple = [(item[0], item[1]/total) for item in count_tuple]
+        # distribution_tuple = [(item[0], item[1]/total) for item in count_tuple]
             
         mpl.rcParams.update({'font.size': 16})
 
-        x_axis = range(len(distribution_tuple))
-        plt.plot(x_axis, [i[1]*100 for i in distribution_tuple], lw=3) 
+        x_axis = range(len(count_tuple))
+        plt.bar(x_axis, [i[1] for i in count_tuple] ) 
         plt.title("")
-        plt.xlabel("hexagons " + str(x_axis))
-        plt.ylabel("dist.")
+        plt.xlabel("hexagons (size: " + str(x_axis) + ")")
+        plt.ylabel("counts")
         # plt.legend()
         plt.xticks([])
         plt.gca().xaxis.set_tick_params(length=0)
@@ -107,7 +107,6 @@ class Distviz(object):
 
 if __name__ == '__main__':
     sample = ['892a1008b27ffff', '892a100d6cbffff', '892a100d6cfffff', '892a100d6c7ffff', '892a100d613ffff', '892a100d68bffff', '892a100d683ffff']
-    viz_seq = Seqviz(sample)
-    viz_seq.plot()
-
+    viz_seq = Seqviz(sample, "seq")
+    viz_seq.show_map()
 
