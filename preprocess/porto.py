@@ -22,7 +22,7 @@ def main(resolution, plot=False):
         os.makedirs('./data/') 
 
     # Download dataset
-    filename = wget.download(url)
+    filename = wget.download(url, download_dst)
 
     # Loading data unzipfile
     zip_file = zipfile.ZipFile(input_path)
