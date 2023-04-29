@@ -1,47 +1,56 @@
 import os
 import wget
 import zipfile
+import argparse
 import pandas as pd
 
 from traj2h3 import Points2h3
 from viz import Seqviz
 
-# hyperparameters
-url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/00339/train.csv.zip'
-download_dst = 'data/'
-input_path = 'data/train.csv.zip'
-input_fname = "train.csv"
-export_fname = 'porto'
-h3_res = 9  # hex resolution
+def main(resolution, plot=False):
 
-# Check if data directory exits
-if not os.path.exists("./data/"):
-    os.makedirs('./data/') 
+    # hyperparameters
+    url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/00339/train.csv.zip'
+    download_dst = 'data/'
+    input_path = 'data/train.csv.zip'
+    input_fname = "train.csv"
+    export_fname = 'porto'
+    h3_res = resolution  # hex resolution
 
-# Download porto taxi dataset
-filename = wget.download(url, out=download_dst)
+    # Check if data directory exits
+    if not os.path.exists("./data/"):
+        os.makedirs('./data/') 
 
-# Loading data
-# Unzipfile
-zip_file = zipfile.ZipFile(input_path)
+    # Download dataset
+    filename = wget.download(url)
 
-# Converting Files To Pandas Dataframe
-df = pd.read_csv(zip_file.open(input_fname))
-print(df.info())
-print("data loaded")
+    # Loading data unzipfile
+    zip_file = zipfile.ZipFile(input_path)
 
-# Drop columns that won't be used
-df = df.drop(["DAY_TYPE", "CALL_TYPE", "ORIGIN_CALL", "ORIGIN_STAND", "DAY_TYPE", "MISSING_DATA"], axis=1)
-df.rename(columns={'TRIP_ID': 'trip_id', 'TAXI_ID': 'taxi_id', 'POLYLINE':'route_points', 'TIMESTAMP':'timestamp'}, inplace=True)
-print("preprocessing done")
+    # Converting Files To Pandas Dataframe
+    df = pd.read_csv(zip_file.open(input_fname))
+    print(df.info())
+    print(f'{export_fname} data loaded, resolution is {h3_res}')
 
-export_fname += "_hex" +str(h3_res) + ".csv"
-porto_hex_seq = Points2h3(df, h3_res, True, export_fname)
-traj_seq = porto_hex_seq.get_hexseq()
+    # Drop columns that won't be used
+    df = df.drop(["DAY_TYPE", "CALL_TYPE", "ORIGIN_CALL", "ORIGIN_STAND", "DAY_TYPE", "MISSING_DATA"], axis=1)
+    df.rename(columns={'TRIP_ID': 'trip_id', 'TAXI_ID': 'taxi_id', 'POLYLINE':'route_points', 'TIMESTAMP':'timestamp'}, inplace=True)
+    print("preprocessing done")
 
-# Plot heatmap of all trajectories or sequence map of one trajectory
-viz_seq = Seqviz(traj_seq['trajectory'].tolist(), 'heatmap')   
-# viz_seq = Seqviz(traj_seq['trajectory'][1], 'seq')
-viz_seq.show_map()
+    export_fname += "_hex" +str(h3_res) + ".csv"
+    porto_hex_seq = Points2h3(df, h3_res, export_fname)
+    traj_seq = porto_hex_seq.get_hexseq()
 
+    # Plot heatmap of all trajectories or sequence map of one trajectory
+    if plot:
+        viz_seq = Seqviz(traj_seq['trajectory'].tolist(), 'heatmap')   
+        viz_seq = Seqviz(traj_seq['trajectory'][1], 'seq')
+        viz_seq.show_map()
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--res', type=int, default=6, help='the resolution of hexagons')
+    args = parser.parse_args()
+    main(args.res, False)
 
