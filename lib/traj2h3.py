@@ -9,7 +9,7 @@ from collections import Counter
 import h3
 from shapely.geometry import LineString
 
-from viz import Distviz
+from lib.viz import Distviz
 
 class Points2h3(object):
     def __init__(self, df_traj, hex_resolution, output_fname:str) -> None:
