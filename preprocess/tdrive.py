@@ -2,8 +2,8 @@ import os
 import argparse
 import pandas as pd
 
-from traj2h3 import Points2h3
-from viz import Seqviz
+from lib.traj2h3 import Points2h3
+from lib.viz import Seqviz
 
 def main(resolution, plot=False):
 
