@@ -91,7 +91,7 @@ class Distviz(object):
         x_axis = range(len(count_tuple))
         plt.bar(x_axis, [i[1] for i in count_tuple] ) 
         plt.title("")
-        plt.xlabel("hexagons (size: " + str(x_axis) + ")")
+        plt.xlabel("hexagons (size: " + str(len(count_tuple)) + ")")
         plt.ylabel("counts")
         # plt.legend()
         plt.xticks([])
