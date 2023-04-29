@@ -12,15 +12,14 @@ from shapely.geometry import LineString
 from viz import Distviz
 
 class Points2h3(object):
-    def __init__(self, df_traj, hex_resolution, hirachical:bool, output_fname:str) -> None:
+    def __init__(self, df_traj, hex_resolution, output_fname:str) -> None:
         self.df_traj = df_traj
         self.hex_resolution = hex_resolution
-        self.hirachical = hirachical #whether to have hirachical tessellation
         self.output_fname = output_fname #whether output to a csv file
         
     # Evaluate the format of list of points, and convert str to list
     def eval_points(self, route_points):
-        points = ast.literal_eval(route_points)
+        points = ast.literal_eval(str(route_points))
         if isinstance(points, list):
             return points
         else:
@@ -80,14 +79,6 @@ class Points2h3(object):
             os.makedirs("./output/figs/")
         distution.plot_dist(count_dict, "output/figs/", str(self.hex_resolution))
 
-        # Get hirachical tessellation
-        if self.hirachical:
-            coarse_traj = self.hirachical_tessellation(count_dict)
-            self.df_traj['coarse_trajectory'] = coarse_traj
-            coarse_candidates = [i for sublist in coarse_traj for i in sublist.split()] 
-            coarse_count_dict = Counter(coarse_candidates)
-            print(f'Coarse vocab size: {len(coarse_count_dict)}')
-            distution.plot_dist(coarse_count_dict, "output/figs/", "coarse")
 
         # Save sequence to csv file
         if self.output_fname:
@@ -98,47 +89,11 @@ class Points2h3(object):
             print("Sequence csv file successfully saved")
         
         return self.df_traj
-        
-        
-    # TODO: hirachical hex seq, starting from 7, recursively make the distribution uniform
-    # Need to reimplement
-    def hirachical_tessellation(self, count_dict) -> list:
-        count_count = Counter(count_dict.values())
-        print(f'count occurence of occurence: {count_count}')
-        
-        coarse_hex = dict()
-        for hex,c in count_dict.items():  
-            if c == 1:   
-                parent = h3.cell_to_parent(hex, self.hex_resolution-3)
-                coarse_hex[hex] = parent
-            elif c == 2:
-                parent = h3.cell_to_parent(hex, self.hex_resolution-2)
-                coarse_hex[hex] = parent
-            elif c == 3:
-                parent = h3.cell_to_parent(hex, self.hex_resolution-1)
-                coarse_hex[hex] = parent
-            
-        coarse_traj = []
-        keys = coarse_hex.keys()
-        for _, val in self.df_traj['trajectory'].items():
-            new_seq = []
-            for j, hex in enumerate(val.split()):
-                if hex in keys:
-                    parent = coarse_hex[hex]
-                    if j==0 or parent != new_seq[-1]:
-                        new_seq.append(parent)
-                else:
-                    new_seq.append(hex)
-        
-            coarse_traj.append(" ".join(new_seq))
-
-        assert len(coarse_traj) == len(self.df_traj)
-        return coarse_traj
 
 
 if __name__ == '__main__':
     zip_file = zipfile.ZipFile('./data/test.csv.zip')
     df = pd.read_csv(zip_file.open("test.csv"))
-    myhex_seq = Points2h3(df, 9, True, "test.csv")
+    myhex_seq = Points2h3(df, 9, "test.csv")
     myhex_seq.get_hexseq()
     
