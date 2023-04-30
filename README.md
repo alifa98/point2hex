@@ -61,6 +61,7 @@ This is an example of how to list things you need to use the software and how to
 
 <!-- PUBLISH DATASETS -->
 ## Publish datasets 
+
 Due to the storage limit, you can find more datasets on [Zenodo](https://zenodo.org/). 
 
 
@@ -69,7 +70,6 @@ Due to the storage limit, you can find more datasets on [Zenodo](https://zenodo.
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
