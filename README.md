@@ -89,3 +89,15 @@ Project Link: [https://github.com/github_username/repo_name](https://github.com/
 * []()
 * []()
 * []()
+
+## Citation
+
+If you like our work and/or use the code/datasets we provide, please consider citing our work as:
+
+to be filled...
+
+Alternatively, you can use the following BibTeX formatting:
+
+```
+insert BibTeX formatting
+```
