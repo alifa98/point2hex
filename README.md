@@ -1,33 +1,36 @@
-# Point TO Hexagon
+# Point To Hexagon
 This is an implementation of how to convert trajecotry datasets to a higher-order trajectory datasets.
 We provide the code and datasets used in our paper: [title](link).
 
-<img src="img/heatmap1.png" alt="Overview of tesselation" width="900">
+
+![Overview of Tesselation](img/heatmap1.png)
 
 
-<!-- TABLE OF CONTENTS -->
 ## Table of Contents
-- [Point TO Hexagon](#point-to-hexagon)
+- [Point To Hexagon](#point-to-hexagon)
   - [Table of Contents](#table-of-contents)
   - [Description](#description)
   - [Dependencies](#dependencies)
-    - [Routing engine](#routing-engine)
-  - [Convert check-ins to route points](#convert-check-ins-to-route-points)
-    - [Data Format](#data-format)
+    - [Routing Engine](#routing-engine)
+    - [Tesselation Engine](#tesselation-engine)
+    - [Python Dependencies](#python-dependencies)
+  - [Convert Check-ins to Route Points](#convert-check-ins-to-route-points)
+    - [Data format](#data-format)
     - [Command Arguments for Converting Check-in Data to Trajectory Points](#command-arguments-for-converting-check-in-data-to-trajectory-points)
     - [Map-matching](#map-matching)
-    - [using other routing engines](#using-other-routing-engines)
-  - [Convert route points to hexagon sequences](#convert-route-points-to-hexagon-sequences)
+    - [Using Other Routing Engines](#using-other-routing-engines)
+  - [Convert Route Points to Hexagon Sequences](#convert-route-points-to-hexagon-sequences)
+    - [Data format](#data-format-1)
+    - [Command Arguments for Converting Route Points to Hexagon Sequences](#command-arguments-for-converting-route-points-to-hexagon-sequences)
     - [Map-matching](#map-matching-1)
-    - [Converting to hexagon sequences](#converting-to-hexagon-sequences)
-  - [Publish datasets](#publish-datasets)
+  - [Visulization](#visulization)
+  - [Published Datasets](#published-datasets)
   - [License](#license)
   - [Contact](#contact)
   - [Acknowledgments](#acknowledgments)
   - [Citation](#citation)
 
 
-<!-- DESCRIPTION -->
 ## Description
 This repository contains a pipelie to to convert datasets from check-ins to hexagon sequences.
 
@@ -49,26 +52,29 @@ The following diagram shows the general pipeline of converting datasets to highe
 
 ## Dependencies
 
-### Routing engine
+### Routing Engine
 We are using OSRM as the routing engine and map-matching engine.
 
 Here is a link to learn how to install and run OSRM.
 [How to setup OSRM usgin Docker](https://github.com/Project-OSRM/osrm-backend#using-docker)
 
+### Tesselation Engine
 Also we are using H3 as the hexagon tesselation engine.
+(Do we need install the H3 library other than the python package?)
 
+### Python Dependencies
 For the python code you can install the dependencies by running:
 ```sh
 pip install -r requirements.txt
 ```
 
 
-## Convert check-ins to route points
+## Convert Check-ins to Route Points
 
 To convert check-ins to route points, we need to use a routing engine to generate the route points between the source and destination of each check-in.
 Make sure you have the information of the routing engine you are using, such as the host and port of the routing engine.
 
-### Data Format
+### Data format
 The input data should be a csv file and, have the following columns:
 
 ```
@@ -118,62 +124,50 @@ Note: The default values mentioned above are used when the corresponding argumen
 ### Map-matching
 As we use OSRM to generate the route points, we do not need map matching for check-ins because we already have map-matched points for our trajectories.
 
-### using other routing engines
+### Using Other Routing Engines
 Our implementation is compatible with other routing engines, you just need to implement the routing engine api like `lib/api/OpenSteetMap.py` file and change the api class in `loc2point_run.py` to your routing engine api class.
 
-## Convert route points to hexagon sequences
+## Convert Route Points to Hexagon Sequences
+
+### Data format
+The input data should be a csv file and, have the following columns:
+
+which the route points are in the following format:
+```
+```
+
+
+### Command Arguments for Converting Route Points to Hexagon Sequences
+
+```sh
+python preprocess/porto.py --res 9
+```
+Alternatively, run the bash script in which you can define your job 
+```sh
+bash job.sh
+```
 
 ### Map-matching
 
-
-### Converting to hexagon sequences
-* From route points to hexagon sequences:
-  ```sh
-  python preprocess/porto.py --res 9
-  ```
-  Alternatively, run the bash script in which you can define your job 
-  ```sh
-  bash job.sh
-
 ## Visulization
 
-<!-- USAGE EXAMPLES -->
-## Usage
 
-* From check-ins to rounte points:
-  to be filled
-
-
-  ```
-
-
-<!-- PUBLISH DATASETS -->
-## Publish datasets 
-
+## Published Datasets 
 Due to the storage limit, you can find more datasets on [Zenodo](https://zenodo.org/). 
 
 
-<!-- LICENSE -->
 ## License
-
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 
-
-
-<!-- CONTACT -->
 ## Contact
 
 Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
 
-Project Link: [https://github.com/github_username/repo_name](https://github.com/github_username/repo_name)
+Project Link: [https://github.com/alifa98/point2hex](https://github.com/alifa98/point2hex)
 
 
-
-
-<!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
-
 * []()
 * []()
 * []()
@@ -186,6 +180,6 @@ to be filled...
 
 Alternatively, you can use the following BibTeX formatting:
 
-```
+```tex
 insert BibTeX formatting
 ```
