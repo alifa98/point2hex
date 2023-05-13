@@ -1,4 +1,4 @@
-# Point TO Hexagon
+# Point To Hexagon
 This is an implementation of how to convert trajecotry datasets to a higher-order trajectory datasets.
 We provide the code and datasets used in our paper: [title](link).
 
