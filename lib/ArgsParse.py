@@ -1,9 +1,17 @@
 import argparse
 
-def parse_args_default_with_config(config):
+def parse_args():
+    """
+    Parse command-line arguments for generating route points.
+
+    Returns:
+        argparse.Namespace: Parsed arguments.
+    """
+
+    # Create an argument parser with the given description
     parser = argparse.ArgumentParser(description='Generate route points')
 
-    # loc 2 point
+    # Define the command-line arguments
     parser.add_argument('input_file', help='Input file path')
 
     parser.add_argument('-o', "--output", help='Output file',
@@ -18,29 +26,12 @@ def parse_args_default_with_config(config):
                         action='store', default='end_point_lat')
     parser.add_argument('-or', '--output-route', help='Route column name in the output file',
                         action='store', default='route_points')
-    parser.add_argument('-ps', '--point-save-off',
-                        help='points will not be saved as a column', action='store_true')
     parser.add_argument('-u', '--base-url',
-                        help='Base URL of the routing service [OSRM]', action='store', default=config("default_routing_api_base_url"))
+                        help='Base URL of the routing service [OSRM]', action='store', default="http://127.0.0.1:5000")
     parser.add_argument('-t', '--threads', help='Number of Threads',
-                        action='store', default=config('default_concurrent_requests'))
-    parser.add_argument('-cr', '--concurrent-requests',
-                        help='number of concurrent requests to the OSRM API', action='store', default=10)
-    parser.add_argument('-mt', '--max-try', help='Max retries',
-                        action='store', default=config('default_max_retries'))
-    parser.add_argument('-d', '--delay', help='Retry delay (ms)',
-                        action='store', default=config('default_retry_delay'))
-    parser.add_argument('-T', '--timeout',
-                        help='Timeout for each request (ms)', action='store', default=config('default_timeout'))
-    parser.add_argument('-S', '--split',
+                        action='store', default=70)
+    parser.add_argument('-s', '--split',
                         help='save output of each thread separately', action='store_true')
 
-    # points 2 Hexagons
-    parser.add_argument('-r', '--resolution',
-                        help='Resolution of the hexagon grid', default=9)
-    parser.add_argument('-ox', '--output-hexagone',
-                        help='Hexagone sequence column name in the output file', default='hex_sequence')
-    parser.add_argument('-hs', '--hex-save-off',
-                        help='hexagons will not be produced', action='store_true')
-    
+    # Parse the command-line arguments and return the parsed values
     return parser.parse_args()

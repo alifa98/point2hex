@@ -1,2 +1,5 @@
 ## git ignore for Python
 __pycache__/
+data/
+out/
+logs/
