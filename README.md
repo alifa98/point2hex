@@ -149,6 +149,23 @@ bash job.sh
 
 ### Map-matching
 
+For map-mathching of the route points, we use OSRM to map-match the route points to the road network.
+You can run the `maching_run.py` script to map-match the route points.
+
+The `maching_run.py` script accepts command-line arguments for map-matching the route points. Below is a description of each argument:
+
+- TODO
+
+Here is one example of running the map-matching on the porto dataset:
+
+Noisy GPS Trace:
+![Noisy GPS Trace](img/unmatched-gps-trace.png)
+
+Map-Matched GPS Trace:
+![Map-Matched GPS Trace](img/matched-gps-trace.png)
+
+
+
 ## Visulization
 
 
