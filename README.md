@@ -159,9 +159,12 @@ The `maching_run.py` script accepts command-line arguments for map-matching the 
 Here is one example of running the map-matching on the porto dataset:
 
 Noisy GPS Trace:
+
 ![Noisy GPS Trace](img/unmatched-gps-trace.png)
 
+
 Map-Matched GPS Trace:
+
 ![Map-Matched GPS Trace](img/matched-gps-trace.png)
 
 
