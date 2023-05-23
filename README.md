@@ -133,7 +133,8 @@ Our implementation is compatible with other routing engines, you just need to im
 The input data should be a csv file and, have the following columns:
 
 which the route points are in the following format:
-```
+```sh
+python preprocess/preprocess.py --res 9 --data data/Archive/ --save nycTaxi
 ```
 
 
