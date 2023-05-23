@@ -1,6 +1,7 @@
 import os
 import argparse
 import pandas as pd
+from pathlib import Path
 
 from lib.traj2h3 import Points2h3
 from lib.viz import Seqviz
@@ -54,7 +55,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--res', type=int, default=6, help='the resolution of hexagons')
-    parser.add_argument('--data', type=str, default='./data/Archive/', help='data path')
+    parser.add_argument('--data', type=Path, default='data/Archive/', help='data path')
     parser.add_argument('--save', type=str, default='nycTaxi', help='export file name')
     args = parser.parse_args()
     main(args.res, args.data, args.save, False)
