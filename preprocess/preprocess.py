@@ -5,11 +5,11 @@ import pandas as pd
 from lib.traj2h3 import Points2h3
 from lib.viz import Seqviz
 
-def main(resolution, plot=False):
+def main(resolution, data_path, export_fname, plot=False):
 
     # hyperparameters
-    data_path = './data/Archive/'
-    export_fname = 'nycTaxi'
+    data_path = data_path
+    export_fname = export_fname
     h3_res = resolution  # hex resolution
 
     # Function that return a list of files to read in a given folder
@@ -54,5 +54,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--res', type=int, default=6, help='the resolution of hexagons')
+    parser.add_argument('--data', type=str, default='./data/Archive/', help='data path')
+    parser.add_argument('--save', type=str, default='nycTaxi', help='export file name')
     args = parser.parse_args()
-    main(args.res, False)
+    main(args.res, args.data, args.save, False)
