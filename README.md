@@ -134,12 +134,16 @@ The input data should be a csv file and, have the following columns:
 
 which the route points are in the following format:
 ```sh
-python preprocess/preprocess.py --res 9 --data data/Archive/ --save nycTaxi
+[(long, lag), (long, lag), ... (long, lag)]
 ```
 
 
 ### Command Arguments for Converting Route Points to Hexagon Sequences
-
+For route points file from last step:
+```sh
+python preprocess/preprocess.py --res 9 --data data/Archive/ --save nycTaxi
+```
+For GPS-based trajectory dataset file:
 ```sh
 python preprocess/porto.py --res 9
 ```
