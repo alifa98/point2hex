@@ -28,4 +28,15 @@ class OpenStreetAPI(API):
                         extracted_steps.extend((item['location'][0], item['location'][1])
                                                for item in step['intersections'])  # longitude, latitude
         return extracted_steps
+    
+    def prepare_matching_url(self, points):
+        request_url = self.base_url + '/match/v1/driving/'
+        for point in points:
+            request_url += str(point[0]) + ',' + str(point[1]) + ';'
+        request_url = request_url[:-1]
+        request_url += '?overview=full&geometries=geojson'
+        return request_url
         
+
+    def parse_matching_response(self, response_json):
+        return response_json['matchings'][0]['geometry']['coordinates']
