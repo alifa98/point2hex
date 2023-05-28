@@ -39,7 +39,7 @@ class MatchRoutePointsThread(threading.Thread):
                     original_points = eval(self.data.iloc[index][args.column])
 
                     if len(original_points) < 2:
-                        self.logger.warn(
+                        self.logger.warning(
                             f"Thread-{self.id}: route for {index} has less than 2 points. Skipping...")
                         continue
 
@@ -64,8 +64,7 @@ class MatchRoutePointsThread(threading.Thread):
             raise Exception(f'Map Matching Error, Response: {response_json}')
 
     def update_points(self, index, points):
-        self.data.iloc[index][args.column] = points
-
+        self.data.at[index, args.column] = points
 
 def get_split_points(total, num_threads):
     step = (total // int(num_threads)) + 1
