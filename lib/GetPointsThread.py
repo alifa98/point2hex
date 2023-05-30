@@ -55,7 +55,7 @@ class GeneratePointsThread(threading.Thread):
         url = self.api.prepare_url(start_point, end_point)
         response = None
         try:
-            response = self.api.send_requeset(session, url, start_point, end_point)
+            response = self.api.send_request(session, url, start_point, end_point)
         except Exception as e:
             self.logger.error(f"Error in getting route form {start_point} to {end_point}.")
             self.logger.error(e)
