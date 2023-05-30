@@ -16,4 +16,16 @@ class API(object):
         This method parses the output of the sen_request() method and returns list of tuples (list of points)
         """
         pass
+
+    def prepare_matching_url(self, points):
+        """
+        This method prepares a url to send the request
+        """
+        pass
+
+    def parse_matching_response(self, response_json):
+        """
+        This method parses the output of the sen_request() method and returns list of tuples (list of points)
+        """
+        pass
         
