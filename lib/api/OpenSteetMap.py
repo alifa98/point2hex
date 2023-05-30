@@ -1,12 +1,10 @@
-import requests
 from lib.api.APIInterface import API
-import logging
+
 
 class OpenStreetAPI(API):
     def __init__(self, base_url) -> None:
         super().__init__()
         self.base_url = base_url
-
 
     def prepare_url(self, start_point, end_point):
         return "{}/route/v1/driving/{},{};{},{}?overview=false&steps=true".format(self.base_url,
@@ -28,7 +26,7 @@ class OpenStreetAPI(API):
                         extracted_steps.extend((item['location'][0], item['location'][1])
                                                for item in step['intersections'])  # longitude, latitude
         return extracted_steps
-    
+
     def prepare_matching_url(self, points):
         request_url = self.base_url + '/match/v1/driving/'
         for point in points:
@@ -36,7 +34,9 @@ class OpenStreetAPI(API):
         request_url = request_url[:-1]
         request_url += '?overview=full&geometries=geojson'
         return request_url
-        
 
     def parse_matching_response(self, response_json):
+        # get the first route's geometry coordinates
+        if len(response_json['matchings']) == 0:
+            return None
         return response_json['matchings'][0]['geometry']['coordinates']
