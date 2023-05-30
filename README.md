@@ -157,10 +157,44 @@ bash job.sh
 For map-mathching of the route points, we use OSRM to map-match the route points to the road network.
 You can run the `maching_run.py` script to map-match the route points.
 
-The `maching_run.py` script accepts command-line arguments for map-matching the route points. Below is a description of each argument:
+The `matching_run.py` script is designed to match route points on a map using a Map Matching Service. It utilizes threading to improve performance by processing multiple routes simultaneously. The script takes command-line arguments to specify input and output files, column names, base URL of the Map Matching Service, and the number of threads to use for parallel processing.
 
-- TODO
+**Usage:**
+```
+python matching_run.py [input_file] [-o OUTPUT] [-c COLUMN] [-u BASE_URL] [-t THREADS]
+```
 
+**Arguments:**
+- `input_file`: Path to the input file containing route data.
+- `-o, --output OUTPUT`: Path to the output file where the matched route data will be saved. (Default: 'output.csv')
+- `-c, --column COLUMN`: The name of the column in the input file that contains the route points. (Default: 'route_points')
+- `-u, --base-url BASE_URL`: The base URL of the Map Matching Service. (Default: 'http://127.0.0.1:5000')
+- `-t, --threads THREADS`: The number of threads to use for parallel processing. (Default: 70)
+
+**Script Overview:**
+1. Parse the command-line arguments.
+1. Define the `MatchRoutePointsThread` class, which represents a thread responsible for matching route points.
+1. Initialize the Map Matching Service API and the logger.
+1. Load the input data file specified by `input_file`.
+1. Split the data points into multiple segments based on the number 1f threads.
+1. Create threads for each segment of data.
+1. Start the threads to initiate the map matching process.
+1. Wait for all threads to finish their execution.
+1. Save the output data to the specified output file.
+1. Display a completion message.
+
+**Thread Execution:**
+The script uses threading to process route points in parallel. Each thread represents a segment of the data and is responsible for matching the route points within that segment. The threads operate as follows:
+1. Each thread retrieves a segment of route points from the input data.
+1. If the number of route points is less than 2, a warning is logged, and the thread skips to the next segment.
+1. The thread sends a request to the Map Matching Service API with the original route points.
+1. If the response is successful, the matched route points are obtained from the response and updated in the data.
+1. If the response is not successful, an error is logged, and the thread skips to the next segment.
+1. Once all threads have finished executing, the output data is saved to the specified output file.
+
+Note: The script assumes that the `lib.Utils` module and the `lib.api.OpenStreetMap` module are available and contain the required functions and classes.
+
+**One Example Of Map-Matching On The City Map**
 Here is one example of running the map-matching on the porto dataset:
 
 Noisy GPS Trace:
