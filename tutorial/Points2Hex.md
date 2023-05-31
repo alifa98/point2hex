@@ -116,4 +116,6 @@ python plot_run.py tutorial/data/porto_toy_hex-r10.csv -z 12
 
 
 
+# Note
+If your data is clean or you do not want to map-match the GPS traces, you can skip the map-matching steps (running OSRM & map-matching command line) and use the command line tool to convert the GPS traces to hexagon trajectories.
 
