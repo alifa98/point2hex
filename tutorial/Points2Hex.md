@@ -77,7 +77,7 @@ You can use the following command to use matching service of the local OSRM back
 Run the following command in the root folder of the repository:
 
 ```bash
-python matching_run.py tutorial/data/porto_toy.csv -o tutorial/data/porto_toy_map-matched.csv -c "TRAJ_COLUMN" -u "http://127.0.0.1:5000" -t 50
+python matching_run.py tutorial/data/porto_toy.csv -o tutorial/data/porto/porto_toy_map-matched.csv -c "TRAJ_COLUMN" -u "http://127.0.0.1:5000" -t 50
 ```
 
 - The first argument is the path to the CSV file that contains the GPS traces.
@@ -112,8 +112,6 @@ python plot_run.py tutorial/data/porto_toy_hex-r10.csv -z 12
 - The first argument is the path to the CSV file that contains the hexagon trajectories.
 - The `-z` argument is the zoom level of the map. (The default value is 12) (higher zoom level means zooming in)
 - the output will be saved in the `out/plots/heatmap-*.jpg` file.
-
-
 
 
 # Note
