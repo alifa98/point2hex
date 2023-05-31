@@ -77,6 +77,7 @@ You can use the following command to use matching service of the local OSRM back
 Run the following command in the root folder of the repository:
 
 ```bash
+mkdir -p tutorial/data/porto
 python matching_run.py tutorial/data/porto_toy.csv -o tutorial/data/porto/porto_toy_map-matched.csv -c "TRAJ_COLUMN" -u "http://127.0.0.1:5000" -t 50
 ```
 
