@@ -5,7 +5,7 @@
 This is a step-by-step example of how to use Point2Hex to convert a GPS trace dataset to hexagon traajectories.
 
 
-# Step 1: clone the repository
+# Step 1: Clone the repository
 use the following command to clone the repository:
 ```bash
 git clone https://github.com/alifa98/point2hex.git
@@ -62,7 +62,7 @@ You can change it based on your needs.
 You can create a conda environment and install the requirements using the following commands:
 
 ```bash
-conda env create --name point2hex --file=environments.yml
+conda env create --name point2hex --file=environment.yml
 ```
 
 Then, activate the environment:
