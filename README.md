@@ -60,7 +60,7 @@ Here is a link to learn how to install and run OSRM.
 
 ### Tesselation Engine
 Also we are using H3 as the hexagon tesselation engine.
-(Do we need install the H3 library other than the python package?)
+
 
 ### Python Dependencies
 For the python code you can install the dependencies by running:
