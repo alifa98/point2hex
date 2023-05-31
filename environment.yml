@@ -1,4 +1,4 @@
-name: point2hex2
+name: point2hex
 channels:
   - defaults
 dependencies:
