@@ -1,8 +1,0 @@
-geojson==3.0.1
-h3==4.0.0b2
-matplotlib==3.7.1
-pandas==1.5.3
-plotly==5.13.1
-setuptools==65.6.3
-Shapely==2.0.1
-wget==3.2
