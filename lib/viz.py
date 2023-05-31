@@ -1,8 +1,7 @@
 import json
+import time
 import pandas as pd 
 from collections import Counter
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 
 import h3
 import plotly.express as px
@@ -39,7 +38,7 @@ class Seqviz(object):
         points = h3.cell_to_boundary(row['hex_id'], True)
         return Polygon(points)
 
-    def show_map(self):
+    def show_map(self, zoom_level:int):
         #construct a df
         if self.plot_type == 'heatmap':
             candidates = [i for sublist in self.hex_seq for i in sublist.split()] 
@@ -71,42 +70,19 @@ class Seqviz(object):
                             # color_continuous_scale="Viridis",
                             # range_color=(0,df_traj_plot['queue'].mean() ),                  
                             mapbox_style='carto-positron',
-                            zoom=12,
+                            zoom=zoom_level,
                             center = {"lat": lat, "lon": lon},
                             opacity=0.7,
                             labels={'seq of hex'})
             )
         fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-        fig.show()
+        
+        # append a timestamp string to the file name to avoid overwriting
+        timestamp = time.strftime("%Y%m%d%H%M%S")
+        fig.write_image(f"out/plots/heatmap-zoom{zoom_level}-{timestamp}.jpeg")
 
-
-class Distviz(object):
-    def plot_dist(self, count_dict, store_dir=None, filename=""):
-        total = sum(count_dict.values())
-        count_tuple = sorted(count_dict.items(), key=lambda item: item[1], reverse=True)
-        # distribution_tuple = [(item[0], item[1]/total) for item in count_tuple]
-            
-        mpl.rcParams.update({'font.size': 16})
-
-        x_axis = range(len(count_tuple))
-        plt.bar(x_axis, [i[1] for i in count_tuple] ) 
-        plt.title("")
-        plt.xlabel("hexagons (size: " + str(len(count_tuple)) + ")")
-        plt.ylabel("counts")
-        # plt.legend()
-        plt.xticks([])
-        plt.gca().xaxis.set_tick_params(length=0)
-        plt.gcf().tight_layout()
-
-        filename += "_hex_dist.png"
-        if store_dir is not None:
-            filename = store_dir.rstrip("/") + "/" + filename
-        plt.savefig(filename)
-        # plt.show()        
-
-
-if __name__ == '__main__':
-    sample = ['892a1008b27ffff', '892a100d6cbffff', '892a100d6cfffff', '892a100d6c7ffff', '892a100d613ffff', '892a100d68bffff', '892a100d683ffff']
-    viz_seq = Seqviz(sample, "seq")
-    viz_seq.show_map()
+# if __name__ == '__main__':
+#     sample = ['892a1008b27ffff', '892a100d6cbffff', '892a100d6cfffff', '892a100d6c7ffff', '892a100d613ffff', '892a100d68bffff', '892a100d683ffff']
+#     viz_seq = Seqviz(sample, "seq")
+#     viz_seq.show_map()
 
