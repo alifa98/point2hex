@@ -49,12 +49,47 @@ class MatchRoutePointsThread(threading.Thread):
                             f"Thread-{self.thread_id}: Route for {index} has less than 2 points. Skipping...")
                         continue
 
-                    map_matched_points = self._send_request(
+                    matching_segments = self._send_request(
                         request_session, original_points)
-                    if not map_matched_points:
+                    if not matching_segments:
                         self.logger.error(
                             f"Thread-{self.thread_id}: Route for {index} is empty. Skipping...")
                         continue
+                    elif len(matching_segments) > 1:
+                        # Route between the last point of the previous segment and the first point of the next segment
+                        self.logger.info(f"Thread-{self.thread_id}: Matching for {index} has more than one segment. Routing between segments...")
+                        map_matched_points = []
+                        for i in range(len(matching_segments) - 1):
+                            
+                            # Add the segment points to the map_matched_points
+                            map_matched_points += matching_segments[i]['geometry']['coordinates']
+
+                            # Get the route points between the last point of the previous segment and the first point of the next segment
+                            start_point = matching_segments[i]['geometry']['coordinates'][-1]
+                            end_point = matching_segments[i + 1]['geometry']['coordinates'][0]
+
+                            # Send the request to the routing API
+                            routing_url = self.api.prepare_routing_url(start_point, end_point)
+                            routing_response = self.api.send_request(request_session,routing_url, start_point, end_point)
+                            route_points_list = self.api.parse_routing_response(routing_response)
+                            
+                            if not route_points_list:
+                                self.logger.error(
+                                    f"Thread-{self.thread_id}: Route between segments for {index} is empty. Halting...")
+                                self.logger.debug(f"Thread-{self.thread_id}: Debug info: {start_point}, {end_point}")
+                                self.logger.debug(f"Thread-{self.thread_id}: Debug info: {routing_url}")
+                                self.logger.debug(f"Thread-{self.thread_id}: Debug info: {routing_response}")
+                                exit(1)
+
+                            # Add the route points to the map_matched_points (converting from list of tuples to list of lists)
+                            map_matched_points += [list(ele) for ele in route_points_list]
+
+                        # Add the last segment points to the map_matched_points
+                        map_matched_points += matching_segments[-1]['geometry']['coordinates']
+                          
+                    else:
+                        map_matched_points = matching_segments[0]['geometry']['coordinates']
+
                     self._update_points(index, map_matched_points)
                 except Exception as e:
                     self.logger.error(
@@ -68,7 +103,8 @@ class MatchRoutePointsThread(threading.Thread):
         response = session.get(url)
         response_json = response.json()
         if response_json['code'] == 'Ok':
-            return self.api.parse_matching_response(response_json)
+           # return matchings list
+           return self.api.parse_matching_response(response_json)
         else:
             raise Exception(f'Map Matching Error, Response: {response_json}')
 

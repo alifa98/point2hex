@@ -52,7 +52,7 @@ class GeneratePointsThread(threading.Thread):
         """
         Returns list of tuples as a list of points of the route
         """
-        url = self.api.prepare_url(start_point, end_point)
+        url = self.api.prepare_routing_url(start_point, end_point)
         response = None
         try:
             response = self.api.send_request(session, url, start_point, end_point)
@@ -61,7 +61,7 @@ class GeneratePointsThread(threading.Thread):
             self.logger.error(e)
 
         try:
-            route_points_list = self.api.parse_response(response)
+            route_points_list = self.api.parse_routing_response(response)
         except Exception as e:
             self.logger.error(f"Error in parsing response for {start_point} to {end_point}, Response: {response}")
             self.logger.error(e)

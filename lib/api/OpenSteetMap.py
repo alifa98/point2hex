@@ -38,7 +38,7 @@ class OpenStreetAPI(API):
         super().__init__()
         self.base_url = base_url
 
-    def prepare_url(self, start_point, end_point):
+    def prepare_routing_url(self, start_point, end_point):
         """
         Prepares the URL for the API request.
 
@@ -70,7 +70,7 @@ class OpenStreetAPI(API):
         """
         return session.get(url)
 
-    def parse_response(self, response):
+    def parse_routing_response(self, response):
         """
         Parses the response from the API request.
 
@@ -135,4 +135,5 @@ class OpenStreetAPI(API):
         # get the first route's geometry coordinates
         if len(response_json['matchings']) == 0:
             return None
-        return response_json['matchings'][0]['geometry']['coordinates']
+            
+        return response_json['matchings']
