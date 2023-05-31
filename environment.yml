@@ -1,4 +1,4 @@
-name: point2hex
+name: point2hex2
 channels:
   - defaults
 dependencies:
@@ -29,6 +29,7 @@ dependencies:
     - geojson==3.0.1
     - h3==4.0.0b2
     - idna==3.4
+    - kaleido==0.2.1
     - numpy==1.24.3
     - plotly==5.14.1
     - requests==2.31.0
