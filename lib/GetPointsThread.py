@@ -1,7 +1,5 @@
 import threading
 import requests
-from lib.Utils import get_hex_seq_from_route_points
-
 
 class GeneratePointsThread(threading.Thread):
     def __init__(self, id, trips, start_index, end_index, api, args, logger):
