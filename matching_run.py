@@ -75,12 +75,10 @@ class MatchRoutePointsThread(threading.Thread):
                             
                             if not route_points_list:
                                 self.logger.error(
-                                    f"Thread-{self.thread_id}: Route between segments for {index} is empty. Halting...")
+                                    f"Thread-{self.thread_id}: Route between segments for {index} is empty. Just connecting two segments ...")
                                 self.logger.debug(f"Thread-{self.thread_id}: Debug info: {start_point}, {end_point}")
                                 self.logger.debug(f"Thread-{self.thread_id}: Debug info: {routing_url}")
                                 self.logger.debug(f"Thread-{self.thread_id}: Debug info: {routing_response}")
-                                ## FIXME: This should be handled in a better way
-                                exit(1)
 
                             # Add the route points to the map_matched_points (converting from list of tuples to list of lists)
                             map_matched_points += [list(ele) for ele in route_points_list]
