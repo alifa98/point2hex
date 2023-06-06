@@ -79,6 +79,7 @@ class MatchRoutePointsThread(threading.Thread):
                                 self.logger.debug(f"Thread-{self.thread_id}: Debug info: {start_point}, {end_point}")
                                 self.logger.debug(f"Thread-{self.thread_id}: Debug info: {routing_url}")
                                 self.logger.debug(f"Thread-{self.thread_id}: Debug info: {routing_response}")
+                                map_matched_points += [start_point, end_point]
 
                             # Add the route points to the map_matched_points (converting from list of tuples to list of lists)
                             map_matched_points += [list(ele) for ele in route_points_list]
