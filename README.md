@@ -199,13 +199,12 @@ Here is one example of running the map-matching on the porto dataset:
 
 Noisy GPS Trace:
 
-![Noisy GPS Trace](img/unmatched-gps-trace.png)
+<img src=img/matched-gps-trace.png width=30% height=30%>
 
 
 Map-Matched GPS Trace:
 
-![Map-Matched GPS Trace](img/matched-gps-trace.png)
-
+<img src=img/unmatched-gps-trace.png width=30% height=30%>
 
 
 ## Visulization
