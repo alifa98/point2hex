@@ -138,19 +138,16 @@ class MatchRoutePointsThread(threading.Thread):
         Update the points in the original dataset.
         """
         if args.stream:
-            self.data.at[index, args.column] = points
             row = self.data.iloc[index]
             row = row.to_frame().T
+            row.at[0, args.column] = points
             with StringIO() as string_io:
                 row.to_csv(string_io, header=False, index=False)
                 string_io.seek(0)
                 self.output_file.write(string_io.getvalue())
                 # flush the buffer once in a while
-            if index % 1 == 0:
+            if index %100 == 0:
                 self.output_file.flush()
-            # delete the row from the dataframe to save memory
-            self.data.drop(index, inplace=True)
-
         else:
             self.data.at[index, args.column] = points
 
