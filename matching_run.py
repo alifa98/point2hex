@@ -118,6 +118,7 @@ class MatchRoutePointsThread(threading.Thread):
 
         # Close the output file if it is a stream
         if args.stream:
+            self.output_file.flush()
             self.output_file.close()
 
     def _send_request(self, session, points):
@@ -140,7 +141,7 @@ class MatchRoutePointsThread(threading.Thread):
         if args.stream:
             row = self.data.iloc[index]
             row = row.to_frame().T
-            row.at[0, args.column] = points
+            row.at[index, args.column] = points
             with StringIO() as string_io:
                 row.to_csv(string_io, header=False, index=False)
                 string_io.seek(0)
