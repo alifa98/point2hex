@@ -195,16 +195,13 @@ The script uses threading to process route points in parallel. Each thread repre
 Note: The script assumes that the `lib.Utils` module and the `lib.api.OpenStreetMap` module are available and contain the required functions and classes.
 
 **One Example Of Map-Matching On The City Map**
+
 Here is one example of running the map-matching on the porto dataset:
 
-Noisy GPS Trace:
 
-<img src=img/matched-gps-trace.png width=30% height=30%>
-
-
-Map-Matched GPS Trace:
-
-<img src=img/unmatched-gps-trace.png width=30% height=30%>
+Noisy GPS Trace             |  Map-Matched GPS Trace
+:-------------------------:|:-------------------------:
+<img src=img/unmatched-gps-trace.png width=50% height=50%>  |  <img src=img/matched-gps-trace.png width=50% height=50%>
 
 
 ## Visulization
