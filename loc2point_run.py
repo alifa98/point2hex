@@ -27,9 +27,10 @@ def get_split_points(total, num_threads):
     split_points_list = [i for i in range(0, total, step)]
 
     # Make sure all of the instances included (last step may contain more values)
-    split_points_list.pop()
-    # Ranges are like [start,end) so we do not need to add -1 here.
-    split_points_list.append(total)
+    if split_points_list[-1] != total:
+
+        # Ranges are like [start,end) so we do not need to add -1 here.
+        split_points_list.append(total)
 
     return split_points_list
 
