@@ -1,14 +1,10 @@
+import concurrent.futures
 import os
 import argparse
 import pandas as pd
 from lib.traj2h3 import Points2h3
 
-def main(resolution, data_path, export_fname, column_name):
-
-    # hyperparameters
-    data_path = data_path
-    export_fname = export_fname
-    h3_res = resolution  # hex resolution
+def main(resolutions_list, input_dir, output_dir, column_name):
 
     # Function that return a list of files to read in a given folder
     def get_files(direc):
@@ -19,7 +15,7 @@ def main(resolution, data_path, export_fname, column_name):
                 
         return full_files
 
-    files_path_list = get_files(data_path)  
+    files_path_list = get_files(input_dir)  
     print("Reading in the .csv files...")
 
     # Read datasets from trajectory route points
@@ -28,15 +24,24 @@ def main(resolution, data_path, export_fname, column_name):
         data_list.append(pd.read_csv(file_path, encoding='latin1'))
 
     dataframe = pd.concat(data_list, ignore_index=True)
-    print(f'data loaded, resolution is {h3_res}')
 
     # Drop columns that won't be used
     dataframe.dropna(inplace=True, subset=[column_name])
-    print("preprocessing is done")
+    
     print ("Size of data frame: ", dataframe.shape)
+    
+    dataset_processor = Points2h3(dataframe, output_dir, column_name)
+    dataset_processor.pre_process()
 
-    dataset_processor = Points2h3(dataframe, h3_res, export_fname, column_name)
-    dataset_processor.get_hexseq()
+    threads_list = []
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+        future_to_res = {executor.submit(dataset_processor.get_hexseq, res): res for res in resolutions_list}
+        for future in concurrent.futures.as_completed(future_to_res):
+            try:
+                print("the resolution ", future_to_res[future] ," is finished.")
+            except Exception as exc:
+                print("resolution ", future_to_res[future], " has generated an expecption, ",exc)
 
 
 if __name__ == '__main__':
@@ -47,12 +52,13 @@ if __name__ == '__main__':
 
     # Define the command-line arguments
     parser.add_argument('input_dir', help='Input files directory')
-    parser.add_argument('-o', "--output", help='Output file path',
-                    action='store', default='output.csv')
-    parser.add_argument('-r','--resoluton', type=int, default=6, help='The resolution of hexagons')
+    parser.add_argument('-o', "--output", help='Output directory path (output file name is output_resX.csv)',
+                    action='store', default='./')
+    parser.add_argument('-r','--resoluton', type=str, default="6", help='The list of resolutions for generating hexagons')
     parser.add_argument(
     '-c', "--column", help='Route points column name', default='route_points')
     args = parser.parse_args()
 
+    resolutions_list = [int(res.strip()) for res in args.resoluton.strip().split(",") ]
 
-    main(args.resoluton, args.input_dir, args.output, args.column)
+    main(resolutions_list, args.input_dir, args.output, args.column)

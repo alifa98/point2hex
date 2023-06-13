@@ -1,43 +1,26 @@
-import ast
+import os
 from typing import Iterator
 import h3
+import swifter
 from shapely.geometry import LineString
-
+import pickle
 
 class Points2h3(object):
-    def __init__(self, df_traj, hex_resolution, output_fname, column_name) -> None:
+    def __init__(self, df_traj, output_dir, column_name) -> None:
         self.df_traj = df_traj
-        self.hex_resolution = hex_resolution
-        self.output_fname = output_fname  # whether output to a csv file
+        self.output_dir = output_dir
         self.column_name = column_name
 
-    # Evaluate the format of list of points, and convert str to list
-    def eval_points(self, route_points):
-        points_list = ast.literal_eval(str(route_points))
-        if isinstance(points_list, list):
-            return points_list
-        else:
-            raise Exception(
-                "Please check if the input df has route_points column, which should be list of tuples")
-
-    # Get hex sequence
-    def get_hexseq(self):
-        # Drop rows with no data in the brackets
-        self.df_traj = self.df_traj[self.df_traj[self.column_name].apply(
+    def pre_process(self):
+        print("dropping rows which cannot create a LineString...")
+        self.df_traj = self.df_traj[self.df_traj[self.column_name].swifter.apply(
             lambda x: len(eval(x)) > 1)]
+        
+        self.df_traj.reset_index()
+        print("single-point rows are dropped. size of data frame: ", self.df_traj.shape)
 
-        self.df_traj['points#tempHex2Rand'] = self.df_traj[self.column_name].apply(
-            lambda x: self.eval_points(x))
-
-        # Drop rows with only one pair of points
-        # self.df_traj = self.df_traj[self.df_traj['points'].apply(lambda x: len(x) > 2)].reset_index(drop=True)
-
-        self.df_traj['geometry#tempHexRand'] = self.df_traj['points#tempHex2Rand'].apply(
-            lambda x: LineString(x))
-        print("lineString generated")
-
-        # Generate hex sequence from linestring
-
+    def get_hexseq(self, res):
+        
         def sequential_deduplication(func: Iterator[str]) -> Iterator[str]:
             '''
             Decorator that doesn't permit two consecutive items to be the same
@@ -64,21 +47,13 @@ class Points2h3(object):
                 b = h3.latlng_to_cell(j[1], j[0], resolution)
                 yield from h3.grid_path_cells(a, b)  # inclusive of a and b
 
-        self.df_traj['higher_order_trajectory'] = self.df_traj['geometry#tempHexRand'].apply(
-            lambda x: ' '.join(h3polyline(x, self.hex_resolution)))
-        print("Initial hex sequence generated")
+        print("Generating hex sequence...")
+        new_hexagon_column = self.df_traj[self.column_name].swifter.apply(
+            lambda x: ' '.join(h3polyline(LineString(eval(x)), res)))
 
-        # Save sequence to csv file
-        df_output = self.df_traj.drop(
-            ["points#tempHex2Rand", self.column_name, "geometry#tempHexRand"], axis=1)
-        df_output.to_csv(self.output_fname, index=False)
-        print("Sequence csv file successfully saved")
-
-        return self.df_traj
-
-
-# if __name__ == '__main__':
-#     zip_file = zipfile.ZipFile('./data/test.csv.zip')
-#     df = pd.read_csv(zip_file.open("test.csv"))
-#     myhex_seq = Points2h3(df, 9, "test.csv")
-#     myhex_seq.get_hexseq()
+        #making a deep copy to be saved:
+        df_copy = pickle.loads(pickle.dumps(self.df_traj)) 
+        df_copy['higher_order_trajectory'] = new_hexagon_column
+        df_copy = df_copy.drop([self.column_name], axis=1)
+        df_copy.to_csv(os.path.join(self.output_dir,f"output-res{res}.csv"), index=False)
+        print("Sequence csv file successfully saved:", os.path.join(self.output_dir,f"output-res{res}.csv"))
