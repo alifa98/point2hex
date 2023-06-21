@@ -47,7 +47,7 @@ GPS traces are more accurate than check-ins, however, they are more difficult to
 
 The following diagram shows the general pipeline of converting datasets to higher-order trajectory datasets.
 
-![Overview of Data Conversion](img/pipeline.jpg)
+![Overview of Data Conversion](img/pipeline-new.png)
 
 
 ## Dependencies
@@ -208,7 +208,7 @@ Noisy GPS Trace             |  Map-Matched GPS Trace
 
 
 ## Published Datasets 
-Due to the storage limit, you can find more datasets on [Zenodo](https://zenodo.org/). 
+Due to the storage limit, you can find more datasets on [Zenodo](https://doi.org/10.5281/zenodo.7879595). 
 
 
 ## License
