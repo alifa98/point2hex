@@ -1,6 +1,6 @@
 # Point To Hexagon
 This is an implementation of how to convert trajecotry datasets to a higher-order trajectory datasets.
-We provide the code and datasets used in our paper: [title](link).
+We provide the code and datasets used in our paper: [Point2Hex: Higher-order Mobility Flow Data and Resources](link).
 
 
 ![Overview of Tesselation](img/heatmap1.png)
@@ -47,7 +47,7 @@ GPS traces are more accurate than check-ins, however, they are more difficult to
 
 The following diagram shows the general pipeline of converting datasets to higher-order trajectory datasets.
 
-![Overview of Data Conversion](img/pipeline.jpg)
+![Overview of Data Conversion](img/pipeline-new.png)
 
 
 ## Dependencies
@@ -208,7 +208,7 @@ Noisy GPS Trace             |  Map-Matched GPS Trace
 
 
 ## Published Datasets 
-Due to the storage limit, you can find more datasets on [Zenodo](https://zenodo.org/). 
+Due to the storage limit, you can find more datasets on [Zenodo](https://doi.org/10.5281/zenodo.7879595). 
 
 
 ## License
@@ -217,24 +217,44 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 ## Contact
 
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
+Ali Faraji - email@faraji@yorku.ca
+
+Jing Li - email@jliellen@yorku.ca
 
 Project Link: [https://github.com/alifa98/point2hex](https://github.com/alifa98/point2hex)
 
 
-## Acknowledgments
+<!--## Acknowledgments
 * []()
 * []()
 * []()
+-->
 
 ## Citation
 
 If you like our work and/or use the code/datasets we provide, please consider citing our work as:
 
-to be filled...
+Faraji, Ali, Li, Jing, Alix, Gian, Alsaeed, Mahmoud, Yanin, Nina, Nadiri, Amirhossein, & Papagelis, Manos. (2023). Higher-order Mobility Flow Data (1.0.0) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.7879595
 
 Alternatively, you can use the following BibTeX formatting:
 
 ```tex
-insert BibTeX formatting
+@dataset{faraji_ali_2023_7879595,
+  author       = {Faraji, Ali and
+                  Li, Jing and
+                  Alix, Gian and
+                  Alsaeed, Mahmoud and
+                  Yanin, Nina and
+                  Nadiri, Amirhossein and
+                  Papagelis, Manos},
+  title        = {Higher-order Mobility Flow Data},
+  month        = jun,
+  year         = 2023,
+  note         = {{Github repository: 
+                   https://github.com/alifa98/point2hex}},
+  publisher    = {Zenodo},
+  version      = {1.0.0},
+  doi          = {10.5281/zenodo.7879595},
+  url          = {https://doi.org/10.5281/zenodo.7879595}
+}
 ```
