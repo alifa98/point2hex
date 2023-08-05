@@ -4,6 +4,7 @@
 
 This is a step-by-step example of how to use Point2Hex to convert a GPS trace dataset to hexagon traajectories.
 
+Note: this tutorial will be updated soon according to the new API, the commands in the home readme are up-to-date.
 
 # Step 1: Clone the repository
 use the following command to clone the repository:
