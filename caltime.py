@@ -21,33 +21,31 @@ def main(input_fname_ho, output_path, resoluton):
     print("preprocess done")
 
     # Merge two tables
-    result = pd.merge(df_raw, df_ho, how='right', left_on='trip_id', right_on='trip_id')
+    merged_table = pd.merge(df_raw, df_ho, how='right', left_on='trip_id', right_on='trip_id')
     print("merge done")
     
-    # Compute staytime percentage of each cell
-    def calculate_percentage(route_points, higher_order_trajectory):
+    # Compute time step of each cell
+    def caltime(route_points, higher_order_trajectory):
         converted_list = ast.literal_eval(route_points)
-        higher_order_cells = set(higher_order_trajectory.split(" "))
+        
+        # Count corresponding hexagons in the raw rount points
         cell_counter = Counter()
- 
         for lon, lat in converted_list:
             hex_cell = h3.latlng_to_cell(lat, lon, int(resoluton)) 
-            if hex_cell in higher_order_cells:
-                cell_counter[hex_cell] += 1
-                
-        total_points = sum(cell_counter.values())
-        
-        if total_points == 0:
-            return {}
-        
-        percentage_dict = {}
-        for cell, count in cell_counter.items():
-            percentage_dict[cell] = (count / total_points) * 100
-            
-        return percentage_dict
+            cell_counter[hex_cell] += 1
 
-    result['percentage'] = result.apply(lambda row: calculate_percentage(row['route_points'], row['higher_order_trajectory']), axis=1)
-    result.to_csv(output_path + "output_res" +resoluton + ".csv", index=False)
+        # Initialize an empty list to store the final result
+        hex_count = []
+
+        # Split the sequence into a list and iterate through it
+        for element in higher_order_trajectory.split(" "):
+            count = cell_counter.get(element, 0)  # Get the count from cell_counter or default to 0
+            hex_count.append([element, count if count > 0 else 1])  # Use value 1 if the element is not found in cell_counter
+        
+        return hex_count
+
+    merged_table['count'] = merged_table.apply(lambda row: caltime(row['route_points'], row['higher_order_trajectory']), axis=1)
+    merged_table.to_csv(output_path + "output_res" +resoluton + ".csv", index=False)
 
 if __name__ == '__main__':
 
@@ -56,7 +54,7 @@ if __name__ == '__main__':
         description='Calculate staytime for each hexagon of a trip')
 
     # Define the command-line arguments
-    parser.add_argument('input_dir', help='Input files directory')
+    parser.add_argument('input_dir', help='Input files directory') # Read ho file
     parser.add_argument('-o', "--output", help='Output directory path (output file name is output_resX.csv)',
                         action='store', default='./output/')
     parser.add_argument('-r', '--resoluton', type=str, default="7",
