@@ -2,12 +2,11 @@ import h3
 import ast
 import argparse
 import pandas as pd
-from collections import Counter
 
 def main(input_fname_ho, output_path, resoluton):
 
     # Read porto
-    input_fname_raw = "data/train.csv"
+    input_fname_raw = "data/raw.csv"
 
     # Converting Files To Pandas Dataframe
     df_raw = pd.read_csv(input_fname_raw)
@@ -24,25 +23,47 @@ def main(input_fname_ho, output_path, resoluton):
     merged_table = pd.merge(df_raw, df_ho, how='right', left_on='trip_id', right_on='trip_id')
     print("merge done")
     
-    # Compute time step of each cell
+    # Compute time steps for each hexagonal cell in a sequence
     def caltime(route_points, higher_order_trajectory):
-        converted_list = ast.literal_eval(route_points)
+        points_list = ast.literal_eval(route_points)
+
+        # Split the sequence into a list
+        sequence_list = higher_order_trajectory.split(" ")
         
-        # Count corresponding hexagons in the raw rount points
-        cell_counter = Counter()
-        for lon, lat in converted_list:
+        # Get corresponding hexagons for all points
+        raw_hex = []
+        for lon, lat in points_list:
             hex_cell = h3.latlng_to_cell(lat, lon, int(resoluton)) 
-            cell_counter[hex_cell] += 1
+            raw_hex.append(hex_cell)
 
         # Initialize an empty list to store the final result
-        hex_count = []
+        result = []
 
-        # Split the sequence into a list and iterate through it
-        for element in higher_order_trajectory.split(" "):
-            count = cell_counter.get(element, 0)  # Get the count from cell_counter or default to 0
-            hex_count.append([element, count if count > 0 else 1])  # Use value 1 if the element is not found in cell_counter
-        
-        return hex_count
+        # Initialize variables to keep track of the current element and count
+        current_element = None
+        current_count = 0
+
+        # Iterate through the sequence list and populate the result list
+        for element in sequence_list:
+            # Count occurrences of the element in raw_data
+            count = sum(1 for value in raw_hex if value == element)
+            
+            if element == current_element:
+                # Increment the count of the existing element
+                current_count += count
+            else:
+                # Save the previous element-count pair to the result if it's not the initial element
+                if current_element is not None:
+                    result.append([current_element, current_count if current_count > 0 else 1])
+                
+                # Update the current element and count
+                current_element = element
+                current_count = count
+
+        # Add the last element-count pair to the result
+        result.append([current_element, current_count if current_count > 0 else 1])
+
+        return result
 
     merged_table['count'] = merged_table.apply(lambda row: caltime(row['route_points'], row['higher_order_trajectory']), axis=1)
     merged_table.to_csv(output_path + "output_res" +resoluton + ".csv", index=False)
@@ -54,7 +75,7 @@ if __name__ == '__main__':
         description='Calculate staytime for each hexagon of a trip')
 
     # Define the command-line arguments
-    parser.add_argument('input_dir', help='Input files directory') # Read ho file
+    parser.add_argument('input_dir', help='Input files directory') # Read ho dataset
     parser.add_argument('-o', "--output", help='Output directory path (output file name is output_resX.csv)',
                         action='store', default='./output/')
     parser.add_argument('-r', '--resoluton', type=str, default="7",
