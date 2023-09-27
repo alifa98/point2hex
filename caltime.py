@@ -1,12 +1,14 @@
 import h3
 import ast
 import argparse
+import numpy as np
 import pandas as pd
+from concurrent.futures import ThreadPoolExecutor
 
-def main(input_fname_ho, output_path, resoluton):
+def main(input_fname_ho, output_path, resoluton, n_threads):
 
     # Read porto
-    input_fname_raw = "data/raw.csv"
+    input_fname_raw = "data/train.csv"
 
     # Converting Files To Pandas Dataframe
     df_raw = pd.read_csv(input_fname_raw)
@@ -22,8 +24,19 @@ def main(input_fname_ho, output_path, resoluton):
     # Merge two tables
     merged_table = pd.merge(df_raw, df_ho, how='right', left_on='trip_id', right_on='trip_id')
     print("merge done")
+
+    # Multithreading for DataFrame
+    def parallel_apply(df, func, n_threads=4):
+        # Split DataFrame
+        df_split = np.array_split(df, n_threads)
+        
+        # Initialize ThreadPoolExecutor and apply function in parallel
+        with ThreadPoolExecutor() as executor:
+            df = pd.concat(executor.map(func, df_split))
+        
+        return df
     
-    # Compute time steps for each hexagonal cell in a sequence
+    # Compute time steps for each hexagonal cell
     def caltime(route_points, higher_order_trajectory):
         points_list = ast.literal_eval(route_points)
 
@@ -65,8 +78,14 @@ def main(input_fname_ho, output_path, resoluton):
 
         return result
 
-    merged_table['count'] = merged_table.apply(lambda row: caltime(row['route_points'], row['higher_order_trajectory']), axis=1)
+    # Wrapper function to apply caltime
+    def apply_caltime(df_chunk):
+        df_chunk['count'] = df_chunk.apply(lambda row: caltime(row['route_points'], row['higher_order_trajectory']), axis=1)
+        return df_chunk
+
+    merged_table = parallel_apply(merged_table, apply_caltime, n_threads=n_threads)
     merged_table.to_csv(output_path + "output_res" +resoluton + ".csv", index=False)
+
 
 if __name__ == '__main__':
 
@@ -75,13 +94,15 @@ if __name__ == '__main__':
         description='Calculate staytime for each hexagon of a trip')
 
     # Define the command-line arguments
-    parser.add_argument('input_dir', help='Input files directory') # Read ho dataset
+    parser.add_argument('input_dir', help='Input files directory')
     parser.add_argument('-o', "--output", help='Output directory path (output file name is output_resX.csv)',
                         action='store', default='./output/')
     parser.add_argument('-r', '--resoluton', type=str, default="7",
                         help='The list of resolutions for generating hexagons')
+    parser.add_argument('-t', '--threads',
+                    help='Number of threads', action='store', default=70)
     args = parser.parse_args()
 
-    main(args.input_dir, args.output, args.resoluton)
+    main(args.input_dir, args.output, args.resoluton, args.threads)
 
 
