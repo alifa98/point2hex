@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 def main(input_fname_ho, output_path, resoluton, n_threads):
 
     # Read porto
-    input_fname_raw = "data/train.csv"
+    input_fname_raw = "data/raw.csv"
 
     # Converting Files To Pandas Dataframe
     df_raw = pd.read_csv(input_fname_raw)
@@ -49,48 +49,18 @@ def main(input_fname_ho, output_path, resoluton, n_threads):
             hex_cell = h3.latlng_to_cell(lat, lon, int(resoluton)) 
             raw_hex.append(hex_cell)
 
-        # Assign 1 to each hexagon if it's in the sequence
-        raw_hex_count = [[element, 1] for element in raw_hex if element in sequence_list]
+        # Assign 1 to each hexagon in the sequence
+        sequence_list_count = [[element, 1] for element in sequence_list]
 
-        # Aggregate the consecutive hexagons
-        # Step 1: Initialize an empty list for the result
-        agg_hex_count = []
+        last_visited_index = 0
+        for element in raw_hex:
+            try:
+                last_visited_index = sequence_list.index(element, last_visited_index)
+            except ValueError:
+                continue
+            sequence_list_count[last_visited_index][1] += 1
 
-        # Step 2: Initialize current_element and count
-        current_element = None
-        count = 0
-
-        # Step 3: Iterate through the given list
-        for element, element_count in raw_hex_count:
-            if element == current_element:
-                count += element_count  # Increment count for consecutive elements
-            else:
-                if current_element is not None:
-                    agg_hex_count.append([current_element, count])  # Append current element and count to result
-                current_element = element  # Update current element
-                count = element_count  # Update count
-
-        # Step 4: Add the last element and count to result
-        if current_element is not None:
-            agg_hex_count.append([current_element, count])
-
-        # Initialize an empty list to store the final result
-        result = []
-
-        # Iterate through sequence_list
-        for element in sequence_list:
-            # Search for the element in agg_hex_count
-            found = False
-            for i, (key, value) in enumerate(agg_hex_count):
-                if key == element:
-                    result.append([element, value])
-                    del agg_hex_count[i]  # Remove the matched entry
-                    found = True
-                    break  # Exit loop once a match is found
-            if not found:
-                result.append([element, 1])  # Set value to 1 if not found in agg_hex_count
-
-        return result
+        return sequence_list_count
 
     # Wrapper function to apply caltime
     def apply_caltime(df_chunk):
@@ -105,7 +75,7 @@ if __name__ == '__main__':
 
     # Set up command line argument parsing
     parser = argparse.ArgumentParser(
-        description='Calculate staytime for each hexagon of a trip')
+        description='Calculate time steps for each hexagon of a trip')
 
     # Define the command-line arguments
     parser.add_argument('input_dir', help='Input files directory')
