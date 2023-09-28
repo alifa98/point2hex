@@ -49,32 +49,46 @@ def main(input_fname_ho, output_path, resoluton, n_threads):
             hex_cell = h3.latlng_to_cell(lat, lon, int(resoluton)) 
             raw_hex.append(hex_cell)
 
+        # Assign 1 to each hexagon if it's in the sequence
+        raw_hex_count = [[element, 1] for element in raw_hex if element in sequence_list]
+
+        # Aggregate the consecutive hexagons
+        # Step 1: Initialize an empty list for the result
+        agg_hex_count = []
+
+        # Step 2: Initialize current_element and count
+        current_element = None
+        count = 0
+
+        # Step 3: Iterate through the given list
+        for element, element_count in raw_hex_count:
+            if element == current_element:
+                count += element_count  # Increment count for consecutive elements
+            else:
+                if current_element is not None:
+                    agg_hex_count.append([current_element, count])  # Append current element and count to result
+                current_element = element  # Update current element
+                count = element_count  # Update count
+
+        # Step 4: Add the last element and count to result
+        if current_element is not None:
+            agg_hex_count.append([current_element, count])
+
         # Initialize an empty list to store the final result
         result = []
 
-        # Initialize variables to keep track of the current element and count
-        current_element = None
-        current_count = 0
-
-        # Iterate through the sequence list and populate the result list
+        # Iterate through sequence_list
         for element in sequence_list:
-            # Count occurrences of the element in raw_data
-            count = sum(1 for value in raw_hex if value == element)
-            
-            if element == current_element:
-                # Increment the count of the existing element
-                current_count += count
-            else:
-                # Save the previous element-count pair to the result if it's not the initial element
-                if current_element is not None:
-                    result.append([current_element, current_count if current_count > 0 else 1])
-                
-                # Update the current element and count
-                current_element = element
-                current_count = count
-
-        # Add the last element-count pair to the result
-        result.append([current_element, current_count if current_count > 0 else 1])
+            # Search for the element in agg_hex_count
+            found = False
+            for i, (key, value) in enumerate(agg_hex_count):
+                if key == element:
+                    result.append([element, value])
+                    del agg_hex_count[i]  # Remove the matched entry
+                    found = True
+                    break  # Exit loop once a match is found
+            if not found:
+                result.append([element, 1])  # Set value to 1 if not found in agg_hex_count
 
         return result
 
@@ -100,7 +114,7 @@ if __name__ == '__main__':
     parser.add_argument('-r', '--resoluton', type=str, default="7",
                         help='The list of resolutions for generating hexagons')
     parser.add_argument('-t', '--threads',
-                    help='Number of threads', action='store', default=70)
+                    help='Number of threads', action='store', default=4)
     args = parser.parse_args()
 
     main(args.input_dir, args.output, args.resoluton, args.threads)
