@@ -298,7 +298,7 @@ Ali Faraji, Jing Li, Gian Alix, Mahmoud Alsaeed, Nina Yanin, Amirhossein Nadiri,
 Alternatively, you can use the following BibTeX formatting:
 
 ```tex
-@inproceedings{10.1145/3589132.3625619,
+@inproceedings{Faraji2023point2hex,
 author = {Faraji, Ali and Li, Jing and Alix, Gian and Alsaeed, Mahmoud and Yanin, Nina and Nadiri, Amirhossein and Papagelis, Manos},
 title = {Point2Hex: Higher-order Mobility Flow Data and Resources},
 year = {2023},
@@ -311,7 +311,7 @@ booktitle = {Proceedings of the 31st ACM International Conference on Advances in
 articleno = {69},
 numpages = {4},
 keywords = {trajectory datasets, higher-order mobility flow datasets, generator},
-location = {<conf-loc>, <city>Hamburg</city>, <country>Germany</country>, </conf-loc>},
+location = {Hamburg, Germany},
 series = {SIGSPATIAL '23}
 }
 ```
