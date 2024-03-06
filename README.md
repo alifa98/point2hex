@@ -267,12 +267,12 @@ The column name is the same as the output column name of the `point2hex_run.py` 
 
 ## Output
 
-The script generates a heatmap visualization using the provided higher order trajectory sequences.
+The script generates a heatmap visualization using the provided higher-order trajectory sequences.
 The heatmap will be saved in the `out/plots` folder with the name `heatmap-zoomX-timestamp.jpeg`.
 
 
 ## Published Datasets
-Due to storage limitations, you can find more datasets on [Zenodo](https://doi.org/10.5281/zenodo.7879595). 
+Due to storage limitations, you can find more datasets on [Zenodo](https://zenodo.org/records/8076553). 
 
 
 ## License
@@ -292,27 +292,26 @@ Project Link: [https://github.com/alifa98/point2hex](https://github.com/alifa98/
 
 If you like our work and/or use the code/datasets we provide, please consider citing our work as:
 
-Faraji, Ali, Li, Jing, Alix, Gian, Alsaeed, Mahmoud, Yanin, Nina, Nadiri, Amirhossein, & Papagelis, Manos. (2023). Higher-order Mobility Flow Data (1.0.0) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.7879595
+Ali Faraji, Jing Li, Gian Alix, Mahmoud Alsaeed, Nina Yanin, Amirhossein Nadiri, and Manos Papagelis. 2023. Point2Hex: Higher-order Mobility Flow Data and Resources. In Proceedings of the 31st ACM International Conference on Advances in Geographic Information Systems (SIGSPATIAL '23). Association for Computing Machinery, New York, NY, USA, Article 69, 1–4. https://doi.org/10.1145/3589132.3625619
+
 
 Alternatively, you can use the following BibTeX formatting:
 
 ```tex
-@dataset{faraji_ali_2023_7879595,
-  author       = {Faraji, Ali and
-                  Li, Jing and
-                  Alix, Gian and
-                  Alsaeed, Mahmoud and
-                  Yanin, Nina and
-                  Nadiri, Amirhossein and
-                  Papagelis, Manos},
-  title        = {Higher-order Mobility Flow Data},
-  month        = jun,
-  year         = 2023,
-  note         = {{Github repository: 
-                   https://github.com/alifa98/point2hex}},
-  publisher    = {Zenodo},
-  version      = {1.0.0},
-  doi          = {10.5281/zenodo.7879595},
-  url          = {https://doi.org/10.5281/zenodo.7879595}
+@inproceedings{10.1145/3589132.3625619,
+author = {Faraji, Ali and Li, Jing and Alix, Gian and Alsaeed, Mahmoud and Yanin, Nina and Nadiri, Amirhossein and Papagelis, Manos},
+title = {Point2Hex: Higher-order Mobility Flow Data and Resources},
+year = {2023},
+isbn = {9798400701689},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3589132.3625619},
+doi = {10.1145/3589132.3625619},
+booktitle = {Proceedings of the 31st ACM International Conference on Advances in Geographic Information Systems},
+articleno = {69},
+numpages = {4},
+keywords = {trajectory datasets, higher-order mobility flow datasets, generator},
+location = {<conf-loc>, <city>Hamburg</city>, <country>Germany</country>, </conf-loc>},
+series = {SIGSPATIAL '23}
 }
 ```
