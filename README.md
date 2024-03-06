@@ -1,6 +1,6 @@
 # Point to Hexagon
 This is an implementation of how to convert trajectory datasets to higher-order trajectory datasets.
-We provide the code and datasets used in our paper: [Point2Hex: Higher-order Mobility Flow Data and Resources](link).
+We provide the code and datasets used in our paper: [Point2Hex: Higher-order Mobility Flow Data and Resources](https://dl.acm.org/doi/10.1145/3589132.3625619).
 
 
 ![Overview of Tessellation](img/heatmap1.png)
